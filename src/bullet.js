@@ -14,8 +14,10 @@ export default class Bullet extends Component {
   render() {
     return (
       <div className="bullet">
-        <Icon type={this.props.type}/>
-        <Label content={this.props.content} clickHandler={this.props.clickHandler}/>
+        <button type="button" onClick={() => this.props.clickHandler(this.props.content)}>
+          <Icon type={this.props.type}/>
+          <Label content={this.props.content} clickHandler={this.props.clickHandler}/>
+         </button>
       </div>
     );
   }

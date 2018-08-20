@@ -9,6 +9,7 @@ export default class App extends Component {
 
     this.hashIntoGroups = this.hashIntoGroups.bind(this);
     this.viewOneGroupHandler = this.viewOneGroupHandler.bind(this);
+    this.viewAllGroupsHandler = this.viewAllGroupsHandler.bind(this);
 
     this.state = {
       mode: "allGroups", /*"allGroups", "oneGroup" */
@@ -36,12 +37,20 @@ export default class App extends Component {
   }
 
   viewOneGroupHandler(groupName){
-    // setState to "oneGroup"
+    this.setState({
+      mode: "oneGroup"
+    });
     console.log("SHOW: ", groupName)
   }
 
+  viewAllGroupsHandler(){
+    this.setState({
+      mode: "allGroups"
+    });
+  }
+
   render() {
-    let backBtn = this.state.mode === "oneGroup" ? <button type="button">Back to All Groups</button> : null 
+    let backBtn = this.state.mode === "oneGroup" ? <button type="button" id="back-btn" onClick={this.viewAllGroupsHandler}>Back to All Groups</button> : null 
 
     return (
       <div className="app">

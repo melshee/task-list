@@ -11,9 +11,9 @@ export default class Label extends Component {
   render() {
     return (
       <div className="label">
-        <button type="button" onClick={() => this.props.clickHandler(this.props.content)}>
-          {this.props.content}
-        </button>
+        
+        {this.props.content}
+       
       </div>
     );
   }

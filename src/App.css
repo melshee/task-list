@@ -20,6 +20,24 @@
 .bullet {
   margin: auto;
   max-width: 150px;
+  text-align: left;
+}
+
+button {
+  border: none;
+  margin: 2px 0px 2px 0px;
+  white-space: nowrap;
+  font-size: 1em;
+}
+
+*:focus {
+  outline: none;
+}
+
+#back-btn {
+  position: absolute;
+  right: 50px;
+  top: 150px;
 }
 
 .icon {
