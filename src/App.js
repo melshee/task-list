@@ -12,6 +12,8 @@ export default class App extends Component {
     this.viewAllGroupsHandler = this.viewAllGroupsHandler.bind(this);
     this.clickedTaskHandler = this.clickedTaskHandler.bind(this);
     this.getOneGroup = this.getOneGroup.bind(this);
+    this.updateDependencies = this.updateDependencies.bind(this);
+    this.calcTaskStatus = this.calcTaskStatus.bind(this)
 
     this.state = {
       mode: "allGroups", /*"allGroups", "oneGroup" */
@@ -58,7 +60,7 @@ export default class App extends Component {
       mode: "oneGroup",
       tasks: groupData
     });
-    console.log("SHOW: ", groupName);
+    // console.log("SHOW: ", groupName);
   }
 
   viewAllGroupsHandler(){
@@ -68,19 +70,42 @@ export default class App extends Component {
   }
 
   clickedTaskHandler(group, type, id) {
-    // console.log("group: ", group)
-    // console.log("id: ", id)
-    console.log("TYPE: ", type)
-    console.log("next: ", this.taskType[type])
-    let groupData = this.getOneGroup(group);
-    console.log("tasks: ", this.state.tasks);
+    // let groupData = this.getOneGroup(group);
     this.setState( prevState => {
-        let index = prevState.tasks.findIndex(t => {return t.id == id});
-        console.log("index!!: ", index);
-        prevState.tasks[index].completedAt = "now";
+        let index = prevState.tasks.findIndex(t => {return t.id === id});
+        prevState.tasks[index] = this.calcTaskStatus(prevState.tasks[index], type);
         return prevState;
-      })
+    })
     //update tasks
+  }
+
+  updateDependencies(action, id) {
+    if(action === "remove") {
+      Object.values(this.state.tasks).forEach((task) => {
+        let dependencies = task.dependencyIds;
+        let dependency = dependencies.indexOf(id);
+        if(dependency >= 0) {
+          dependencies.splice(dependency,1); //remove the completed task's id from other tasks
+        }
+      });
+    }
+  }
+
+  calcTaskStatus(task, type){
+    if(task.dependencyIds.length > 0) {  //task is locked, should stay the same
+      console.log("still locked, no change");
+    } else if(type === "incomplete" && task.dependencyIds.length === 0 && task.completedAt == null) { //task is incomplete, switch to complete state
+      console.log("incomplete -> complete");
+      task.completedAt = new Date().toLocaleString();
+      this.updateDependencies("remove", task.id);
+    } else if(type === "complete" && task.completedAt != null) { //task is complete, switch to incomplete state?
+      console.log("complete -> incomplete");
+      task.completedAt = null;
+      //update dependencyIds?
+    } else {
+      console.log("unexpected state - probably a bug")
+    }
+    return task;
   }
 
   render() {

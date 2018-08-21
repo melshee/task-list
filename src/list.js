@@ -35,7 +35,7 @@ export default class List extends Component {
   }
   
   render() {
-    console.log("TG's: ", this.props.content);
+    // console.log("TG's: ", this.props.content);
     let items;
     if(this.props.mode === "allGroups") {
       items = Object.keys(this.props.content).map((taskName,i) => {
@@ -48,7 +48,6 @@ export default class List extends Component {
               />
       })
     } else if(this.props.mode === "oneGroup") {
-      console.log("OneG's: ", this.props.content);
       items = Object.values(this.props.content).map((taskName,i) => {
         let task = this.props.content[i];
         return <Bullet
