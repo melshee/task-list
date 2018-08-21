@@ -5,7 +5,7 @@ import Bullet from './bullet'
 
 export default class List extends Component {
   static propTypes = {
-    content: PropTypes.object,
+    content: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
     key: PropTypes.number,
     title: PropTypes.string,
     mode: PropTypes.string, /*Indicates list mode "allGroups" or "oneGroup"*/
@@ -15,9 +15,22 @@ export default class List extends Component {
   constructor(props){
     super(props);
 
+    this.setTaskType = this.setTaskType.bind(this);
+
     this.modeToType = {
       "allGroups": "group",
       "oneGroup": "incomplete"
+    }
+
+  }
+
+  setTaskType(dependencies, completedAt){
+    if( dependencies.length > 0) {
+      return "locked"
+    } else if (completedAt == null) {
+      return "incomplete"
+    } else {
+      return "complete"
     }
   }
   
@@ -27,19 +40,25 @@ export default class List extends Component {
     if(this.props.mode === "allGroups") {
       items = Object.keys(this.props.content).map((taskName,i) => {
         return <Bullet
+                clickHandler={this.props.viewOneGroupHandler}
                 content={taskName}
                 key={i}
                 type={this.modeToType[this.props.mode]}
-                clickHandler={this.props.viewOneGroupHandler}
+                
               />
       })
     } else if(this.props.mode === "oneGroup") {
-      items = 
-              <Bullet
-                content={"individual task"}
-                // key={i}
-                type={"incomplete"}
+      console.log("OneG's: ", this.props.content);
+      items = Object.values(this.props.content).map((taskName,i) => {
+        let task = this.props.content[i];
+        return <Bullet
+                clickHandler={this.props.clickedTaskHandler}
+                content={task.task}
+                task={task}
+                key={i}
+                type={this.setTaskType(task.dependencyIds, task.completedAt)}
               />
+      })
     }
 
     return (

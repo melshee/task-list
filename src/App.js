@@ -10,10 +10,19 @@ export default class App extends Component {
     this.hashIntoGroups = this.hashIntoGroups.bind(this);
     this.viewOneGroupHandler = this.viewOneGroupHandler.bind(this);
     this.viewAllGroupsHandler = this.viewAllGroupsHandler.bind(this);
+    this.clickedTaskHandler = this.clickedTaskHandler.bind(this);
+    this.getOneGroup = this.getOneGroup.bind(this);
 
     this.state = {
       mode: "allGroups", /*"allGroups", "oneGroup" */
-      taskGroups: {}
+      tasks: {}
+    }
+
+    this.taskType = { //to map this.props.type to image
+      "locked": "locked",
+      "incomplete": "complete",
+      "complete": "incomplete",
+      //how to get to locked??
     }
   }
 
@@ -30,17 +39,26 @@ export default class App extends Component {
     return groupHash;
   }
 
+  getOneGroup(groupName){
+    // console.log("gn: ", groupName);
+    // console.log(this.state.tasks);
+    // console.log("getting one group: ", this.state.tasks[groupName]);
+    return this.state.tasks[groupName];
+  }
+
   componentDidMount(){
     this.setState({
-      taskGroups: this.hashIntoGroups()
+      tasks: this.hashIntoGroups()
     })
   }
 
   viewOneGroupHandler(groupName){
+    let groupData = this.getOneGroup(groupName)
     this.setState({
-      mode: "oneGroup"
+      mode: "oneGroup",
+      tasks: groupData
     });
-    console.log("SHOW: ", groupName)
+    console.log("SHOW: ", groupName);
   }
 
   viewAllGroupsHandler(){
@@ -49,9 +67,24 @@ export default class App extends Component {
     });
   }
 
+  clickedTaskHandler(group, type, id) {
+    // console.log("group: ", group)
+    // console.log("id: ", id)
+    console.log("TYPE: ", type)
+    console.log("next: ", this.taskType[type])
+    let groupData = this.getOneGroup(group);
+    console.log("tasks: ", this.state.tasks);
+    this.setState( prevState => {
+        let index = prevState.tasks.findIndex(t => {return t.id == id});
+        console.log("index!!: ", index);
+        prevState.tasks[index].completedAt = "now";
+        return prevState;
+      })
+    //update tasks
+  }
+
   render() {
     let backBtn = this.state.mode === "oneGroup" ? <button type="button" id="back-btn" onClick={this.viewAllGroupsHandler}>Back to All Groups</button> : null 
-
     return (
       <div className="app">
         <header className="app-header">
@@ -59,10 +92,11 @@ export default class App extends Component {
         </header>
         {backBtn}
         <List 
-          content={this.state.taskGroups}
+          content={this.state.tasks} //can be task groups or tasks
           title={"Things To Do"}
           mode={this.state.mode}
           viewOneGroupHandler={this.viewOneGroupHandler}
+          clickedTaskHandler={this.clickedTaskHandler}
         />
 
       </div>
