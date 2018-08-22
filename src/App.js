@@ -17,7 +17,8 @@ export default class App extends Component {
 
     this.state = {
       mode: "allGroups", /*"allGroups", "oneGroup" */
-      tasks: {}
+      tasks: {},
+      allTasks: {}
     }
 
     this.taskType = { //to map this.props.type to image
@@ -42,15 +43,12 @@ export default class App extends Component {
   }
 
   getOneGroup(groupName){
-    // console.log("gn: ", groupName);
-    // console.log(this.state.tasks);
-    // console.log("getting one group: ", this.state.tasks[groupName]);
-    return this.state.tasks[groupName];
+    return this.state.allTasks[groupName];
   }
 
   componentDidMount(){
     this.setState({
-      tasks: this.hashIntoGroups()
+      allTasks: this.hashIntoGroups()
     })
   }
 
@@ -60,7 +58,6 @@ export default class App extends Component {
       mode: "oneGroup",
       tasks: groupData
     });
-    // console.log("SHOW: ", groupName);
   }
 
   viewAllGroupsHandler(){
@@ -81,12 +78,14 @@ export default class App extends Component {
 
   updateDependencies(action, id) {
     if(action === "remove") {
-      Object.values(this.state.tasks).forEach((task) => {
-        let dependencies = task.dependencyIds;
-        let dependency = dependencies.indexOf(id);
-        if(dependency >= 0) {
-          dependencies.splice(dependency,1); //remove the completed task's id from other tasks
-        }
+      Object.values(this.state.allTasks).forEach((taskGroup) => {
+        Object.values(taskGroup).forEach((task) => {
+          let dependencies = task.dependencyIds;
+          let dependency = dependencies.indexOf(id);
+          if(dependency >= 0) {
+            dependencies.splice(dependency,1); //remove the completed task's id from other tasks
+          }
+        });
       });
     }
   }
@@ -110,6 +109,7 @@ export default class App extends Component {
 
   render() {
     let backBtn = this.state.mode === "oneGroup" ? <button type="button" id="back-btn" onClick={this.viewAllGroupsHandler}>Back to All Groups</button> : null 
+    let content = this.state.mode === "oneGroup" ? this.state.tasks : this.state.allTasks;
     return (
       <div className="app">
         <header className="app-header">
@@ -117,7 +117,7 @@ export default class App extends Component {
         </header>
         {backBtn}
         <List 
-          content={this.state.tasks} //can be task groups or tasks
+          content={content} //can be task groups or tasks
           title={"Things To Do"}
           mode={this.state.mode}
           viewOneGroupHandler={this.viewOneGroupHandler}
