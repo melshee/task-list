@@ -33,6 +33,7 @@ export default class App extends Component {
     let groupHash = {};
     let groupName;
     for(let i = 0; i < data.length; i++) {
+      data[i]["completedIds"] = [] 
       groupName = data[i].group;
       if(groupHash[groupName] === undefined) {
         groupHash[groupName] = [];
@@ -83,7 +84,18 @@ export default class App extends Component {
           let dependencies = task.dependencyIds;
           let dependency = dependencies.indexOf(id);
           if(dependency >= 0) {
-            dependencies.splice(dependency,1); //remove the completed task's id from other tasks
+            let t = dependencies.splice(dependency,1); //remove the completed task's id from other tasks
+            task.completedIds.push(t[0]);
+          }
+        });
+      });
+    } else if(action === "add") {
+      Object.values(this.state.allTasks).forEach((taskGroup) => {
+        Object.values(taskGroup).forEach((task) => {
+          let dependency = task.completedIds.indexOf(id);
+          if(dependency !== -1) {
+            let t = task.completedIds.splice(dependency,1); //remove the completed task's id from other tasks
+            task.dependencyIds.push(t[0]);
           }
         });
       });
@@ -100,7 +112,7 @@ export default class App extends Component {
     } else if(type === "complete" && task.completedAt != null) { //task is complete, switch to incomplete state?
       console.log("complete -> incomplete");
       task.completedAt = null;
-      //update dependencyIds?
+      this.updateDependencies("add", task.id);
     } else {
       console.log("unexpected state - probably a bug")
     }
